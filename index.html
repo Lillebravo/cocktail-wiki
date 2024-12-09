@@ -3,10 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Exam - Name</title>
+    <title>Exam - Jerry Lundahl</title>
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
+
+    <nav class="navMenu">
+      <img src="logo.png" alt="Logo">
+      <section class="btnGroup">
+        <button id="homeBtn">Home</button>
+        <input type="text" name="search" id="searchBar" placeholder="Search for cocktail...">
+        <button id="searchBtn" class="material-symbols-outlined">Search</button>
+      </section>
+    </nav>
+
+    <article class="startPage">
+      <h1>Welcome to Cocktail Wiki!</h1>
+      <h3>Have a look at this drink for inspiration:</h3>
+      
+      <p id="randomDrinkText">This is a randomgenerated drink!</p>
+      <p>Not what you´re looking for? Press the button below for another random drink!</p>
+      <button id="randomDrinkBtn">New drink</button>
+    </article>
+
     <script src="index.js" type="module"></script>
   </body>
 </html>

@@ -1,0 +1,76 @@
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
+
+:root {
+    --backgroundColor: rgb(38, 2, 20);
+    --searchBarBackground: rgb(30, 5, 5);
+    --headerColor: rgb(255, 111, 0);
+}
+
+body {
+    background-color: var(--backgroundColor);
+    margin: 0;
+}
+
+.navMenu {
+    top: 0;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    background-color: var(--searchBarBackground);
+    height: 5rem;
+}
+
+.btnGroup {
+    margin-left: 50vw;
+    display: inherit;
+    padding: 0;
+}
+
+#homeBtn {
+    width: 4em;
+    height: 2.2em;
+}
+
+#searchBar {
+    height: 1.8em;
+}
+
+#searchBtn {
+    content: 'search';
+}
+
+.startPage {
+    margin: 0 5vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+}
+
+h1 {
+    color: var(--headerColor);
+    font-size: 3rem;
+}
+
+@media (max-width: 1080px) {
+    .btnGroup {
+        margin-left: 5vw;
+    }
+}
+
+@media (max-width: 600px) {
+    .navMenu {
+        flex-direction: column;
+    }
+    h1 {
+        font-size: 2rem;
+    }
+    p {
+        text-align: center;
+        width: 80vw;
+        text-wrap: wrap;
+    }
+}
