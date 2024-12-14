@@ -51,7 +51,7 @@ function createDrinkElement(drink) {
   thumbnail.alt = drink.name;
 
   const drinkDetailsBtn = document.createElement("button");
-  drinkDetailsBtn.innerHTML = "Details";
+  drinkDetailsBtn.innerHTML = "See more";
   drinkDetailsBtn.addEventListener("click", () => {
     drinkDetailsDiv.innerHTML = ""; // Removes existing styling
     showDrinkDetails(drink);
