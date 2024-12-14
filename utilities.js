@@ -1,5 +1,8 @@
+import { searchBar } from "./index.js";
+
 // Declarations
 const baseURL = `https://www.thecocktaildb.com/api/json/v1/1/`;
+const drinkDetailsDiv = document.querySelector(".drinkDetailsContainer");
 
 // Functions
 function mapRawCocktailData(rawCocktail) {
@@ -29,17 +32,37 @@ async function getRandomDrink() {
 
     // The API returns an array with one drink, here the first(and only) drink in the array is collected
     const rawCocktial = data.drinks[0];
-    const formattedDrink = mapRawCocktailData(rawCocktial);
+    const randomDrink = mapRawCocktailData(rawCocktial);
 
-    return formattedDrink;
+    return randomDrink;
   } catch (error) {
     console.log(`Error fetching random drink from API: ${error}`);
   }
 }
 
-function createDrinkElement(drink) {
-  const drinkDetailsDiv = document.querySelector(".drinkDetailsContainer");
+async function getDrinksByName(drinkName) {
+  try {
+    const res = await fetch(`${baseURL}search.php?s=${drinkName}`);
+    const data = await res.json();
 
+    // Create array of drinks and convert them to readable values
+    const rawCocktails = data.drinks;
+    const drinks = [];
+    for (let i = 0; i < rawCocktails.length; i++) {
+      const drink = mapRawCocktailData(rawCocktails[i]);
+      drinks.push(drink);
+    }
+
+    console.log(drinks); // Only for debugging purposes
+    return drinks;
+  } catch (error) {
+    console.log(
+      `Error searching for drink by name ${drinkName} from API: ${error}`
+    );
+  }
+}
+
+function createDrinkElement(drink) {
   const drinkElement = document.createElement("section");
   drinkElement.classList.add("drink");
   drinkElement.innerHTML = `
@@ -48,22 +71,21 @@ function createDrinkElement(drink) {
     <img src="${drink.thumbnail}" alt="${drink.name}">
   </section>
   `;
-  
+
+  // Insert drink element to DOM
   drinkDetailsDiv.innerHTML = "";
   drinkDetailsDiv.appendChild(drinkElement);
 
-  // Add event listener after the button has been added to DOM
+  // Add event listener after the button has been inserted to DOM
   const drinkDetailsBtn = document.querySelector("#drinkDetailsBtn");
   drinkDetailsBtn.addEventListener("click", () => {
-      const drinkDetailsDiv = document.querySelector(".drink");
-      drinkDetailsDiv.innerHTML = ""; // Removes existing styling
-      showDrinkDetails(drink);
+    const drinkDetailsDiv = document.querySelector(".drink");
+    drinkDetailsDiv.innerHTML = ""; // Removes existing styling
+    showDrinkDetails(drink);
   });
 }
 
 function showDrinkDetails(drink) {
-  const drinkContainer = document.querySelector(".drinkDetailsContainer");
-
   const detailsPage = /*HTML*/ `
   <section class="drinkDetails">
   <h2>${drink.name}</h2>
@@ -85,7 +107,7 @@ function showDrinkDetails(drink) {
   </section>
   `;
 
-  drinkContainer.innerHTML = detailsPage;
+  drinkDetailsDiv.innerHTML = detailsPage;
 }
 
 export async function showRandomDrink() {
@@ -94,5 +116,19 @@ export async function showRandomDrink() {
     createDrinkElement(randomDrink);
   } catch (error) {
     console.log(`Error showing random drink: ${error}`);
+  }
+}
+
+export async function showDrinkSearchResult() {
+  try {
+    const searchText = searchBar.value;
+    const searchResults = await getDrinksByName(searchText);
+
+    for (let i = 0; i < searchResults.length; i++) {
+      const drink = searchResults[i];
+      createDrinkElement(drink);
+    }
+  } catch (error) {
+    console.log(`Error showing drinks from API: ${error}`);
   }
 }

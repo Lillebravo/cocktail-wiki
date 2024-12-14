@@ -1,7 +1,9 @@
-import { showRandomDrink } from "./utilities.js";
+import { showRandomDrink, showDrinkSearchResult} from "./utilities.js";
 
 // Declarations
 const rngDrinkBtn = document.querySelector("#randomDrinkBtn");
+const searchBtn = document.querySelector("#searchBtn");
+export const searchBar = document.querySelector("#searchBar");
 
 // Event listeners
 document.addEventListener("DOMContentLoaded", () => {
@@ -15,4 +17,7 @@ rngDrinkBtn.addEventListener("mouseout", () => {
 });
 rngDrinkBtn.addEventListener("click", () => {
   showRandomDrink();
+});
+searchBtn.addEventListener("click", () => {
+  showDrinkSearchResult();
 });
