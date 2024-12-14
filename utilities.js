@@ -7,7 +7,7 @@ function mapRawCocktailData(rawCocktail) {
   return {
     id: rawCocktail.idDrink,
     name: rawCocktail.strDrink,
-    tags: rawCocktail.strTags ? rawCocktail.strTags.split(",") : [],
+    tags: rawCocktail.strTags ? rawCocktail.strTags.split(", ") : [],
     category: rawCocktail.strCategory,
     alcoholic: rawCocktail.strAlcoholic === "Alcoholic",
     glass: rawCocktail.strGlass,
@@ -87,6 +87,10 @@ function showDrinkDetails(drink) {
   const servingContainer = document.createElement("p");
   servingContainer.textContent = `Served in: ${drink.glass}`;
 
+  const tags = document.createElement("p");
+  tags.textContent = `Tags: ${drink.tags}`;
+
+  // Ingredients
   const ingredientsElement = document.createElement("div");
   ingredientsElement.innerHTML = "<h3>Ingredients:</h3>";
   const ingredientsList = document.createElement("ul");
@@ -97,6 +101,7 @@ function showDrinkDetails(drink) {
   });
   ingredientsElement.appendChild(ingredientsList);
 
+  // Instructions
   const instructionsElement = document.createElement("div");
   instructionsElement.innerHTML = "<h3>Instructions:</h3>";
   const instructionsText = document.createElement("p");
@@ -110,6 +115,7 @@ function showDrinkDetails(drink) {
     category,
     alcoholContent,
     servingContainer,
+    tags,
     ingredientsElement,
     instructionsElement
   );
