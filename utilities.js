@@ -7,7 +7,7 @@ function mapRawCocktailData(rawCocktail) {
   return {
     id: rawCocktail.idDrink,
     name: rawCocktail.strDrink,
-    tags: rawCocktail.strTags ? rawCocktail.strTags.split(", ") : [],
+    tags: rawCocktail.strTags ? rawCocktail.strTags.split(", ") : "None",
     category: rawCocktail.strCategory,
     alcoholic: rawCocktail.strAlcoholic === "Alcoholic",
     glass: rawCocktail.strGlass,
@@ -38,101 +38,60 @@ async function getRandomDrink() {
 }
 
 function createDrinkElement(drink) {
-  // Create a container for drink details
-  const drinkDetailsDiv = document.createElement("div");
-  drinkDetailsDiv.classList.add("drink");
+  const drinkDetailsDiv = document.querySelector(".drinkDetailsContainer");
 
-  // Create and assign drink detail elements
-  const name = document.createElement("h2");
-  name.textContent = drink.name;
+  const drinkElement = document.createElement("section");
+  drinkElement.classList.add("drink");
+  drinkElement.innerHTML = `
+    <h2>${drink.name}</h2>
+    <button id="drinkDetailsBtn">See more</button>
+    <img src="${drink.thumbnail}" alt="${drink.name}">
+  </section>
+  `;
+  
+  drinkDetailsDiv.innerHTML = "";
+  drinkDetailsDiv.appendChild(drinkElement);
 
-  const thumbnail = document.createElement("img");
-  thumbnail.src = drink.thumbnail;
-  thumbnail.alt = drink.name;
-
-  const drinkDetailsBtn = document.createElement("button");
-  drinkDetailsBtn.innerHTML = "See more";
+  // Add event listener after the button has been added to DOM
+  const drinkDetailsBtn = document.querySelector("#drinkDetailsBtn");
   drinkDetailsBtn.addEventListener("click", () => {
-    drinkDetailsDiv.innerHTML = ""; // Removes existing styling
-    showDrinkDetails(drink);
+      const drinkDetailsDiv = document.querySelector(".drink");
+      drinkDetailsDiv.innerHTML = ""; // Removes existing styling
+      showDrinkDetails(drink);
   });
-
-  // Add all drink details to the container
-  drinkDetailsDiv.append(name, drinkDetailsBtn, thumbnail);
-
-  return drinkDetailsDiv;
 }
 
 function showDrinkDetails(drink) {
   const drinkContainer = document.querySelector(".drinkDetailsContainer");
 
-  // Create a container for drink details
-  const drinkDetailsDiv = document.createElement("div");
-  drinkDetailsDiv.classList.add("drinkDetails");
+  const detailsPage = /*HTML*/ `
+  <section class="drinkDetails">
+  <h2>${drink.name}</h2>
+    <img src="${drink.thumbnail}" alt="${drink.name}">
+    <p>Category: ${drink.category}</p>
+    <p>${drink.alcoholic ? "Alcoholic" : "Non-Alcoholic"}</p>
+    <p>Served in: ${drink.glass}</p>
+    <p>Tags: ${drink.tags}</p>
+    
+    <h3>Ingredients:</h3>
+    <ul>
+      ${drink.ingredients
+        .map((item) => `<li>${item.measure || ""} ${item.ingredient}`.trim())
+        .join("")}
+    </ul>
+    
+    <h3>Instructions:</h3>
+    <p>${drink.instructions}</p>
+  </section>
+  `;
 
-  // Create and assign drink detail elements
-  const name = document.createElement("h2");
-  name.textContent = drink.name;
-
-  const thumbnail = document.createElement("img");
-  thumbnail.src = drink.thumbnail;
-  thumbnail.alt = drink.name;
-
-  const category = document.createElement("p");
-  category.textContent = `Category: ${drink.category}`;
-
-  const alcoholContent = document.createElement("p");
-  alcoholContent.textContent = drink.alcoholic ? "Alcoholic" : "Non-Alcoholic";
-
-  const servingContainer = document.createElement("p");
-  servingContainer.textContent = `Served in: ${drink.glass}`;
-
-  const tags = document.createElement("p");
-  tags.textContent = `Tags: ${drink.tags}`;
-
-  // Ingredients
-  const ingredientsElement = document.createElement("div");
-  ingredientsElement.innerHTML = "<h3>Ingredients:</h3>";
-  const ingredientsList = document.createElement("ul");
-  drink.ingredients.forEach((item) => {
-    const ingredient = document.createElement("li");
-    ingredient.textContent = `${item.measure || ""} ${item.ingredient}`.trim();
-    ingredientsList.appendChild(ingredient);
-  });
-  ingredientsElement.appendChild(ingredientsList);
-
-  // Instructions
-  const instructionsElement = document.createElement("div");
-  instructionsElement.innerHTML = "<h3>Instructions:</h3>";
-  const instructionsText = document.createElement("p");
-  instructionsText.textContent = drink.instructions;
-  instructionsElement.appendChild(instructionsText);
-
-  // Add all drink details to the container
-  drinkDetailsDiv.append(
-    name,
-    thumbnail,
-    category,
-    alcoholContent,
-    servingContainer,
-    tags,
-    ingredientsElement,
-    instructionsElement
-  );
-
-  drinkContainer.appendChild(drinkDetailsDiv);
+  drinkContainer.innerHTML = detailsPage;
 }
 
 export async function showRandomDrink() {
   try {
-    const drinkDetailsDiv = document.querySelector(".drinkDetailsContainer");
-    drinkDetailsDiv.innerHTML = "";
-
     const randomDrink = await getRandomDrink();
-    const drinkElement = createDrinkElement(randomDrink);
-
-    drinkDetailsDiv.style.display = "block";
-    drinkDetailsDiv.appendChild(drinkElement);
+    createDrinkElement(randomDrink);
   } catch (error) {
     console.log(`Error showing random drink: ${error}`);
   }
