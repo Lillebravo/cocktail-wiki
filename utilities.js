@@ -40,11 +40,39 @@ async function getRandomDrink() {
 function createDrinkElement(drink) {
   // Create a container for drink details
   const drinkDetailsDiv = document.createElement("div");
+  drinkDetailsDiv.classList.add("drink");
 
   // Create and assign drink detail elements
   const name = document.createElement("h2");
   name.textContent = drink.name;
-  name.classList.add("orange");
+
+  const thumbnail = document.createElement("img");
+  thumbnail.src = drink.thumbnail;
+  thumbnail.alt = drink.name;
+
+  const drinkDetailsBtn = document.createElement("button");
+  drinkDetailsBtn.innerHTML = "Details";
+  drinkDetailsBtn.addEventListener("click", () => {
+    drinkDetailsDiv.innerHTML = ""; // Removes existing styling
+    showDrinkDetails(drink);
+  });
+
+  // Add all drink details to the container
+  drinkDetailsDiv.append(name, drinkDetailsBtn, thumbnail);
+
+  return drinkDetailsDiv;
+}
+
+function showDrinkDetails(drink) {
+  const drinkContainer = document.querySelector(".drinkDetailsContainer");
+
+  // Create a container for drink details
+  const drinkDetailsDiv = document.createElement("div");
+  drinkDetailsDiv.classList.add("drinkDetails");
+
+  // Create and assign drink detail elements
+  const name = document.createElement("h2");
+  name.textContent = drink.name;
 
   const thumbnail = document.createElement("img");
   thumbnail.src = drink.thumbnail;
@@ -86,12 +114,12 @@ function createDrinkElement(drink) {
     instructionsElement
   );
 
-  return drinkDetailsDiv;
+  drinkContainer.appendChild(drinkDetailsDiv);
 }
 
 export async function showRandomDrink() {
   try {
-    const drinkDetailsDiv = document.querySelector(".drinkDetails");
+    const drinkDetailsDiv = document.querySelector(".drinkDetailsContainer");
     drinkDetailsDiv.innerHTML = "";
 
     const randomDrink = await getRandomDrink();

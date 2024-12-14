@@ -12,8 +12,12 @@ body {
   margin: 0;
 }
 
-.orange {
+h1, h2, h3 {
   color: var(--orangeColor);
+}
+
+h1 {
+  font-size: 3rem;
 }
 
 /* Nav */
@@ -57,7 +61,7 @@ button:hover {
 }
 
 /* Main article */
-.startPage {
+.homePage {
   margin: 0 5vw;
   padding: 2em;
   display: flex;
@@ -67,14 +71,36 @@ button:hover {
   color: white;
 }
 
-/* Where the drink details are shown */
-.drinkDetails {
-  flex-direction: column;
+.drink {
+  width: 99%; 
+  align-items: center;
+  text-align: center;
 }
 
-h1 {
-  font-size: 3rem;
-  text-align: center;
+/* Where the drink details are shown */
+.drinkDetails {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items:flex-start;
+}
+
+img {
+  max-width: 100%;
+}
+
+.drinkDetails ul {
+  padding-left: 20px;
+}
+
+#randomDrinkText {
+  color: var(--orangeColor);
 }
 
 #randomDrinkBtn {
@@ -106,8 +132,9 @@ h1 {
     margin-left: 5vw;
   }
   .drinkDetails {
-    width: 90vw;
+    width: 60vw;
     text-align: center;
+    align-items: center;
   }
   .drinkDetails img {
     width: 90vw;
@@ -119,7 +146,7 @@ h1 {
   }
   .drinkDetails li {
     text-align: left;
-    padding-left: 35vw;
+    padding-left: 5vw;
   }
   .drinkDetails li::before {
     content: "•";
@@ -136,5 +163,9 @@ h1 {
   }
   #randomDrinkText {
     text-align: center;
+  }
+  .drinkDetails li {
+    text-align: left;
+    padding-left: 0vw;
   }
 }
