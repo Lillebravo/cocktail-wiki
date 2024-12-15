@@ -183,6 +183,7 @@ export async function showRandomDrink() {
 
 export async function showDrinkSearchResult() {
   try {
+    // Check if search input is valid
     const searchText = searchBar.value.trim();
     if (searchText === "") {
       alert("You have to enter a cocktail name!");
@@ -192,6 +193,7 @@ export async function showDrinkSearchResult() {
     // Clear screen and add info
     drinkDetailsDiv.innerHTML = `<h1 id="headerText">Search Results:</h1>`;
 
+    // get drinks from search
     const searchResults = await getDrinksByName(searchText);
     if (!searchResults || searchResults.length === 0) {
       drinkDetailsDiv.innerHTML += `
@@ -204,16 +206,81 @@ export async function showDrinkSearchResult() {
     const searchResultDiv = document.createElement("div");
     searchResultDiv.classList.add("searchDisplay");
 
-    // Take top 10 search results and add them to display
-    const resultsDisplay = searchResults.slice(0, 10);
-    resultsDisplay.forEach((drink) => {
-      const newDrink = createDrinkElement(drink);
-      searchResultDiv.appendChild(newDrink);
-    });
+    // Create container for page buttons
+    const pageDiv = document.createElement("div");
+    pageDiv.classList.add("pagination");
+    const nrOfDrinksPerPage = 10;
 
-    // Insert display into DOM
+    // #region displaying a specific page of results
+    function displayPageOfResults(pageNr) {
+      searchResultDiv.innerHTML = "";
+
+      // Determine start and end index for current page
+      const startIndex = (pageNr - 1) * nrOfDrinksPerPage;
+      const endIndex = startIndex + nrOfDrinksPerPage;
+
+      // take results for current page
+      const pageResults = searchResults.slice(startIndex, endIndex);
+
+      // create and add drink elements for this page
+      pageResults.forEach(drink => {
+          const newDrink = createDrinkElement(drink);
+          searchResultDiv.appendChild(newDrink);
+      });
+
+      // Update page numbers
+      createPaginationNrs(pageNr);
+    }
+    // #endregion
+
+    // #region creating page number buttons
+    function createPaginationNrs(currentPage) {
+      pageDiv.innerHTML = "";
+      
+      // Calculate nr of pages and only create pagination if there is more than 10 search results
+      const nrOfPages = Math.ceil(searchResults.length / nrOfDrinksPerPage);
+      if (nrOfPages > 1) {
+        // Create a number button for every page
+        for (let i = 1; i <= nrOfPages; i++) {
+          const pageNrButton = document.createElement("button");
+          pageNrButton.innerHTML = i;
+          pageNrButton.dataset.page = i; // Add data to id the buttons for event handling
+          pageNrButton.classList.add("pageNumber");
+         
+          // Highlight current page
+          if (i === currentPage) {
+            pageNrButton.classList.add("active");
+          }
+
+          pageDiv.appendChild(pageNrButton);
+        }
+
+        pageDiv.addEventListener("click", handlePageBtnClick);
+      }
+    }
+    // #endregion
+
+    // #region Event handling for page buttons
+    function handlePageBtnClick(event) {
+      // Find clicked page button
+      const pageBtn = event.target.closest(".pageNumber");
+      if (pageBtn) {
+        // Find page number and display results for that page
+        const pageNr = parseInt(pageBtn.dataset.page);
+        displayPageOfResults(pageNr);
+      }
+    }
+    // #endregion
+
+    // Show results from page 1 at first
+    displayPageOfResults(1);
+
+    // Insert display with results and page number buttons to the page
     drinkDetailsDiv.appendChild(searchResultDiv);
-  } catch (error) {
+    drinkDetailsDiv.appendChild(pageDiv);
+  } 
+  
+  catch (error) {
     console.log(`Error showing drinks from API: ${error}`);
   }
 }
