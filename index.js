@@ -1,23 +1,24 @@
 import { showRandomDrink, showDrinkSearchResult} from "./utilities.js";
 
 // Declarations
-const rngDrinkBtn = document.querySelector("#randomDrinkBtn");
-const searchBtn = document.querySelector("#searchBtn");
 export const searchBar = document.querySelector("#searchBar");
+const rngDrinkBtn = document.querySelector("#randomDrinkBtn");
+const form = document.querySelector("form");
 
 // Event listeners
 document.addEventListener("DOMContentLoaded", () => {
   showRandomDrink();
 });
 rngDrinkBtn.addEventListener("mouseover", () => {
-  rngDrinkBtn.classList.add("rotate-center");
+  rngDrinkBtn.classList.add("rotate-center"); // adding animations class on hover
 });
 rngDrinkBtn.addEventListener("mouseout", () => {
-  rngDrinkBtn.classList.remove("rotate-center");
+  rngDrinkBtn.classList.remove("rotate-center"); // removing animations
 });
-rngDrinkBtn.addEventListener("click", () => {
+rngDrinkBtn.addEventListener("click", () => {;
   showRandomDrink();
 });
-searchBtn.addEventListener("click", () => {
-  showDrinkSearchResult();
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  showDrinkSearchResult()
 });

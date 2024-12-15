@@ -7,39 +7,43 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-
     <nav class="navMenu">
-      <a href=""><img src="logo.png" alt="Logo"/></a>
+      <a href=""><img src="logo.png" alt="Logo" id="logo" /></a>
 
       <div class="btnGroup">
         <a href="">
-          <button id="homeBtn" class="material-symbols-outlined">Home</button>
+          <button id="homeBtn" class="material-symbols-outlined btnGroup">
+            Home
+          </button>
         </a>
-        <input
-          type="text"
-          name="search"
-          id="searchBar"
-          placeholder="Search for cocktail..."
-        />
-        <button id="searchBtn" class="material-symbols-outlined">Search</button>
+        <form id="searchForm">
+          <input
+            type="text"
+            name="search"
+            id="searchBar"
+            placeholder="Search for cocktail..."
+          />
+          <button
+            type="submit"
+            id="searchBtn"
+            class="material-symbols-outlined"
+          >
+            Search
+          </button>
+        </form>
       </div>
     </nav>
 
-    
     <article class="homePage">
-      <h1 id="headerText" class="orange">Welcome to Cocktail Wiki!</h1>
-      <h3 style="color: white;">Have a look at this drink for inspiration:</h3>
-
       <div class="drinkDetailsContainer"></div>
 
       <p id="randomDrinkText">
-        Not what you´re looking for? Press the button below for another random
-        drink!
+        Not what you´re looking for? Press the button below for a random drink!
       </p>
       <button id="randomDrinkBtn" class="material-symbols-outlined">
         local_bar
       </button>
-    </article>  
+    </article>
 
     <script src="index.js" type="module"></script>
   </body>

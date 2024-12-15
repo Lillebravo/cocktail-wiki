@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
 
+/* Global Styles */
 :root {
   --backgroundColor: rgb(38, 2, 20);
   --searchBarBackground: rgb(30, 5, 5);
@@ -20,6 +21,15 @@ h1 {
   font-size: 3rem;
 }
 
+button:hover {
+  background-color: var(--orangeColor);
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+}
+
 /* Nav */
 .navMenu {
   top: 0;
@@ -30,23 +40,25 @@ h1 {
   position: sticky;
   background-color: var(--searchBarBackground);
   height: 5rem;
+  z-index: 1;
 }
 
 .btnGroup {
-  margin-left: 50vw;
-  display: inherit;
+  margin-left: 20vw;
+  display: flex;
+  align-items: center;
   padding: 0;
 }
 
-#homeBtn {
-    height: 1.4em;
-  border: 1px solid #ccc;
-  border-radius: var(--btnBorderRadius) 0 0 var(--btnBorderRadius);
+#searchForm {
+  display: flex;
+  align-items: center;
 }
 
-button:hover {
-  background-color: var(--orangeColor);
-  cursor: pointer;
+#homeBtn {
+  height: 1.4em;
+  border: 1px solid #ccc;
+  border-radius: var(--btnBorderRadius) 0 0 var(--btnBorderRadius);
 }
 
 #searchBar {
@@ -55,6 +67,7 @@ button:hover {
 }
 
 #searchBtn {
+  height: 2.1rem;
   border-radius: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 0 var(--btnBorderRadius) var(--btnBorderRadius) 0;
@@ -68,6 +81,7 @@ button:hover {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  text-align: center;
   color: white;
 }
 
@@ -75,6 +89,21 @@ button:hover {
   width: 99%; 
   align-items: center;
   text-align: center;
+}
+
+.drink:hover {
+  cursor: pointer;
+  scale: 1.05;
+}
+
+#randomDrinkText {
+  color: var(--orangeColor);
+}
+
+#randomDrinkBtn {
+  border-radius: var(--btnBorderRadius);
+  width: 2em;
+  height: 2em;
 }
 
 /* Where the drink details are shown */
@@ -89,24 +118,20 @@ button:hover {
   display: flex;
   flex-direction: column;
   align-items:flex-start;
-}
-
-img {
-  max-width: 100%;
+  text-align: start;
 }
 
 .drinkDetails ul {
   padding-left: 20px;
 }
 
-#randomDrinkText {
-  color: var(--orangeColor);
-}
-
-#randomDrinkBtn {
-  border-radius: var(--btnBorderRadius);
-  width: 2em;
-  height: 2em;
+/* Search result page */
+.searchDisplay {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1em;
+  width: 100%;
+  justify-content: center;
 }
 
 /* Animations */
@@ -152,6 +177,9 @@ img {
     content: "•";
     margin-right: 0.5em;
   }
+  .searchDisplay {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 600px) {
@@ -167,5 +195,8 @@ img {
   .drinkDetails li {
     text-align: left;
     padding-left: 0vw;
+  }
+  .searchDisplay {
+    grid-template-columns: repeat(1, 1fr);
   }
 }
