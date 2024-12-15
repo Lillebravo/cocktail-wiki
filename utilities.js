@@ -5,7 +5,7 @@ const baseURL = `https://www.thecocktaildb.com/api/json/v1/1/`;
 const drinkDetailsDiv = document.querySelector(".drinkDetailsContainer");
 
 // **Functions**
-// Helper function
+// #region Helper function
 function mapRawCocktailData(rawCocktail) {
   /* Removes ingredients and measures which are null and some attributes which aren´t used */
   return {
@@ -25,8 +25,9 @@ function mapRawCocktailData(rawCocktail) {
       .filter((item) => item.ingredient),
   };
 }
+// #endregion
 
-// Functions for getting data from API
+// #region Functions for getting data from API
 async function getRandomDrink() {
   try {
     const res = await fetch(`${baseURL}random.php`);
@@ -46,7 +47,8 @@ async function getDrinksByNameOrId(drink, name = true) {
   try {
     let res;
     let data;
-    if (name) { // default to search on name, else search on id
+    if (name) {
+      // default to search on name, else search on id
       res = await fetch(`${baseURL}search.php?s=${drink}`);
       data = await res.json();
     } else {
@@ -73,8 +75,9 @@ async function getDrinksByNameOrId(drink, name = true) {
     );
   }
 }
+// #endregion
 
-// Element handling functions
+// #region Element handling functions
 function createDrinkElement(drink) {
   const drinkElement = document.createElement("section");
   drinkElement.classList.add("drink");
@@ -91,23 +94,23 @@ function createDrinkElement(drink) {
 
 function drinkHandleOnClick(event) {
   const drinkElement = event.currentTarget;
-
   const drinkName = drinkElement.querySelector("h2").textContent;
 
-  getDrinksByNameOrId(drinkName).then(drinks => {
+  getDrinksByNameOrId(drinkName).then((drinks) => {
     if (drinks && drinks.length > 0) {
       // Looping through all drinks and compare their names with closest drinkname from target to get an exact match
       for (let i = 0; i < drinks.length; i++) {
         const drink = drinks[i];
         if (drink.name === drinkName) {
-          showDrinkDetails(drinks[i]); 
+          showDrinkDetails(drinks[i]);
         }
       }
     }
   });
 }
+// #endregion
 
-// Display functions
+// #region Display functions
 function showDrinkDetails(drink) {
   // Save the HTML from the previous page
   const pageBefore = drinkDetailsDiv.innerHTML;
@@ -118,6 +121,7 @@ function showDrinkDetails(drink) {
   <section class="drinkDetails">
   <h2>${drink.name}</h2>
     <img src="${drink.thumbnail}" alt="${drink.name}">
+    <div class="drinkInfo">
     <p>Category: ${drink.category}</p>
     <p>${drink.alcoholic ? "Alcoholic" : "Non-Alcoholic"}</p>
     <p>Served in: ${drink.glass}</p>
@@ -132,6 +136,7 @@ function showDrinkDetails(drink) {
     
     <h3>Instructions:</h3>
     <p>${drink.instructions}</p>
+    </div>
   </section>
   `;
   const backBtn = document.createElement("button");
@@ -148,7 +153,7 @@ function showDrinkDetails(drink) {
     const drinksBefore = document.querySelectorAll(".drink");
 
     // removing and adding eventlisteners to all drinks in last page to ensure there are no duplicates
-    drinksBefore.forEach(drinkBefore => {
+    drinksBefore.forEach((drinkBefore) => {
       drinkBefore.removeEventListener("click", drinkHandleOnClick);
       drinkBefore.addEventListener("click", drinkHandleOnClick);
     });
@@ -197,7 +202,7 @@ export async function showDrinkSearchResult() {
 
     // Take top 10 search results and add them to display
     const resultsDisplay = searchResults.slice(0, 10);
-    resultsDisplay.forEach(drink => {
+    resultsDisplay.forEach((drink) => {
       const newDrink = createDrinkElement(drink);
       searchResultDiv.appendChild(newDrink);
     });
@@ -208,3 +213,4 @@ export async function showDrinkSearchResult() {
     console.log(`Error showing drinks from API: ${error}`);
   }
 }
+// #endregion
