@@ -5,7 +5,7 @@ const baseURL = `https://www.thecocktaildb.com/api/json/v1/1/`;
 const drinkDetailsDiv = document.querySelector(".drinkDetailsContainer");
 
 // **Functions**
-// #region Helper function
+// #region Helper functions
 function mapRawCocktailData(rawCocktail) {
   /* Removes ingredients and measures which are null and some attributes which aren´t used */
   return {
@@ -43,18 +43,10 @@ async function getRandomDrink() {
   }
 }
 
-async function getDrinksByNameOrId(drink, name = true) {
+async function getDrinksByName(drink) {
   try {
-    let res;
-    let data;
-    if (name) {
-      // default to search on name, else search on id
-      res = await fetch(`${baseURL}search.php?s=${drink}`);
-      data = await res.json();
-    } else {
-      res = await fetch(`${baseURL}lookup.php?i=${drink}`);
-      data = await res.json();
-    }
+    const res = await fetch(`${baseURL}search.php?s=${drink}`);
+    const data = await res.json();
 
     // Create array of drinks and convert them to readable values
     const rawCocktails = data.drinks;
@@ -74,6 +66,18 @@ async function getDrinksByNameOrId(drink, name = true) {
       `Error searching for drink by name ${drink} from API: ${error}`
     );
   }
+}
+
+async function getDrinksByCategory(drinkCategory) {
+
+}
+
+async function getDrinksByIngredient(drinkIngredient) {
+
+}
+
+async function getDrinksByGlassType(drinkGlassType) {
+
 }
 // #endregion
 
@@ -96,7 +100,7 @@ function drinkHandleOnClick(event) {
   const drinkElement = event.currentTarget;
   const drinkName = drinkElement.querySelector("h2").textContent;
 
-  getDrinksByNameOrId(drinkName).then((drinks) => {
+  getDrinksByName(drinkName).then((drinks) => {
     if (drinks && drinks.length > 0) {
       // Looping through all drinks and compare their names with closest drinkname from target to get an exact match
       for (let i = 0; i < drinks.length; i++) {
@@ -188,7 +192,7 @@ export async function showDrinkSearchResult() {
     // Clear screen and add info
     drinkDetailsDiv.innerHTML = `<h1 id="headerText">Search Results:</h1>`;
 
-    const searchResults = await getDrinksByNameOrId(searchText);
+    const searchResults = await getDrinksByName(searchText);
     if (!searchResults || searchResults.length === 0) {
       drinkDetailsDiv.innerHTML += `
       <h3 style="color: white">No cocktails matching search for ${searchText}</h3>
