@@ -21,9 +21,10 @@ function mapRawCocktailData(rawCocktail) {
 }
 
 export async function getDrinksFromAPI(searchParameter, searchValue = null) {
-  const retryParams = ["_glass", "_flute", "_mug", "_drink"];
+  const retryParams = ["_glass", "_flute", "_mug", "_drink", " / unknown"];
   let searchUrl = "";
 
+  // Changes url depending on what search parameter is applied
   if (searchParameter === "random") {
     searchUrl = "random.php";
   } else if (searchParameter === "name") {
@@ -48,7 +49,7 @@ export async function getDrinksFromAPI(searchParameter, searchValue = null) {
       res = await fetch(`${baseURL}${searchUrl}${searchValue}`);
       data = await res.json();
 
-      // Trying other parameters if no data was found
+      // Trying to fetch data by adding additional parameters if no data was found
       if (data.drinks === "no data found") {
         for (const param of retryParams) {
           res = await fetch(`${baseURL}${searchUrl}${searchValue}${param}`);
