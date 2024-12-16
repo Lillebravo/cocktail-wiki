@@ -24,13 +24,13 @@ function mapRawCocktailData(rawCocktail) {
     let searchUrl = "";
     if (searchParameter === "random") {
       searchUrl = "random.php";
-    } else if (searchParameters.value === "name") {
+    } else if (searchParameter === "name") {
       searchUrl = "search.php?s=";
-    } else if (searchParameters.value === "category") {
+    } else if (searchParameter === "category") {
       searchUrl = "filter.php?c=";
-    } else if (searchParameters.value === "ingredient") {
+    } else if (searchParameter === "ingredient") {
       searchUrl = "filter.php?i=";
-    } else if (searchParameters.value === "glassType") {
+    } else if (searchParameter === "glassType") {
       searchUrl = "filter.php?g=";
     }
   
@@ -38,7 +38,10 @@ function mapRawCocktailData(rawCocktail) {
       let res;
       if (searchValue === null || searchParameter === "random") {
         res = await fetch(`${baseURL}${searchUrl}`);
-      } else {
+      } else if (searchParameter === "glassType" && !searchValue.includes("glass")) { // adds glass if user only searches for example beer
+        res = await fetch(`${baseURL}${searchUrl}${searchValue}_glass`);
+      }
+       else {
         res = await fetch(`${baseURL}${searchUrl}${searchValue}`);
       }
       const data = await res.json();
@@ -56,6 +59,7 @@ function mapRawCocktailData(rawCocktail) {
       if (rawCocktails.length > 0) {
         for (let i = 0; i < rawCocktails.length; i++) {
           const drink = mapRawCocktailData(rawCocktails[i]);
+          if (drink.name === undefined) return []; // removes undefined results
           drinks.push(drink);
         }
       }

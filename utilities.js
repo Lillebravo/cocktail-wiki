@@ -1,6 +1,10 @@
 import { searchBar } from "./index.js";
 import { getDrinksFromAPI } from "./apiFunctions.js";
 
+// things to add:
+// Need more validation in search function, if the results are undefined it should display no results found
+// Favourite page
+
 // **Declarations**
 const drinkDetailsDiv = document.querySelector(".drinkDetailsContainer");
 const nrOfDrinksPerPage = 10;

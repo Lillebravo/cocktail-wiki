@@ -29,6 +29,10 @@ button:hover {
 img {
   max-width: 100%;
 }
+
+a {
+  text-decoration: none;
+}
 /* #endregion */
 
 /* #region Navbar */
@@ -61,8 +65,14 @@ img {
   align-items: center;
 }
 
+#searchParameters {
+  border: none;
+}
+
 #homeBtn {
   height: 1.4em;
+  width: 1.4em;
+  justify-content: center;
   border: 1px solid #ccc;
   border-radius: var(--btnBorderRadius) 0 0 var(--btnBorderRadius);
 }
@@ -74,9 +84,13 @@ img {
 
 #searchBtn {
   height: 2.1rem;
-  border-radius: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 0 var(--btnBorderRadius) var(--btnBorderRadius) 0;
+}
+
+#favBtn {
+  height: 2.1rem;
+  border: none;
 }
 /* #endregion */
 
@@ -224,11 +238,14 @@ img {
 }
 
 @media (max-width: 600px) {
+  h1 {
+    font-size: 2rem;
+  }
   .navMenu {
     flex-direction: column;
   }
-  h1 {
-    font-size: 2rem;
+  .btnGroup {
+    margin-left: 0;
   }
   #randomDrinkText {
     text-align: center;
