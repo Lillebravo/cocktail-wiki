@@ -2,9 +2,11 @@ import { showRandomDrink, showDrinkSearchResult, displayFavDrinks} from "./utili
 
 // Declarations
 export const searchBar = document.querySelector("#searchBar");
+const searchBtn = document.querySelector("#searchBtn");
 const favBtn = document.querySelector("#favBtn");
 const rngDrinkBtn = document.querySelector("#randomDrinkBtn");
 const form = document.querySelector("form");
+searchBtn.disabled = true;
 
 // Event listeners
 favBtn.addEventListener("click", () => {
@@ -25,4 +27,11 @@ rngDrinkBtn.addEventListener("mouseout", () => {
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   showDrinkSearchResult();
+});
+searchBar.addEventListener("input", () => {
+  if (searchBar.value.trim() === "") {
+    searchBtn.disabled = true;
+  } else {
+    searchBtn.disabled = false;
+  }
 });

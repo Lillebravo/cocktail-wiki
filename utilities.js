@@ -123,11 +123,12 @@ function showDrinkDetails(drink) {
 
   // Insert created elements to DOM
   drinkDetailsDiv.innerHTML = detailsPage;
+
   const backBtn = document.querySelector("#backBtn");
   const addFavBtn = document.querySelector("#addFavBtn");
   const removeFavBtn = document.querySelector("#removeFavBtn");
 
-  changeVisibleFavItems(drink, addFavBtn, removeFavBtn);
+  displayFavButtons(drink, addFavBtn, removeFavBtn);
 
   // Functionality for back button
   backBtn.addEventListener("click", () => {
@@ -136,7 +137,7 @@ function showDrinkDetails(drink) {
     } else if (lastAction === displayFavDrinks) {
       displayFavDrinks();
     } else {
-      drinkDetailsDiv.innerHTML = pageBefore; // reload last page
+      drinkDetailsDiv.innerHTML = pageBefore; // reload last page if last action was random
     }
 
     // removing and adding eventlisteners to all drinks in last page to ensure there are no duplicates
@@ -149,20 +150,22 @@ function showDrinkDetails(drink) {
 
   addFavBtn.addEventListener("click", () => {
     saveFavs(drink);
-    changeVisibleFavItems(drink, addFavBtn, removeFavBtn);
+    displayFavButtons(drink, addFavBtn, removeFavBtn);
   });
 
   removeFavBtn.addEventListener("click", () => {
     removeFavs(drink);
-    changeVisibleFavItems(drink, addFavBtn, removeFavBtn);
-    if (lastAction === displayFavDrinks) {
+    displayFavButtons(drink, addFavBtn, removeFavBtn);
+
+    // If working on your favorites, removing one sends you back to your fav page for smoother experience
+    if (lastAction === displayFavDrinks) { 
       displayFavDrinks();
     }
   })
 }
 
 export async function showRandomDrink() {
-  lastAction = null;
+  lastAction = null; // Reset last action so back button works like it should
   try {
     searchBar.value = "";
 
@@ -191,11 +194,6 @@ export async function showDrinkSearchResult() {
 
     // Sets previous text to current search text after checking if they differ
     previousSearchText = searchText;
-
-    if (searchText === "") {
-      alert("You didn´t write anything!");
-      return;
-    }
 
     // Clear screen and add info
     drinkDetailsDiv.innerHTML = `<h1 id="headerText">Search Results:</h1>`;
@@ -241,7 +239,6 @@ function displayPageOfResults(pageNr) {
 }
 // #endregion
 
-
 // #region saveFunctions
 export async function displayFavDrinks() {
   lastAction = displayFavDrinks;
@@ -252,10 +249,11 @@ export async function displayFavDrinks() {
     for (let i = 0; i < localStorage.length; i++) {
       const drinkId = localStorage.key(i);
       const drink = await getDrinksFromAPI("id", drinkId);
-      if (drink.length !== 0) {
+      if (drink.length !== 0) { // If drink exists
         savedDrinks.push(drink[0]);
       }
 
+      // Insert saved results into DOM
       searchResults = savedDrinks;
       displayPageOfResults(1);
 
@@ -290,7 +288,7 @@ function isFavourite(drink) {
   return false;
 }
 
-function changeVisibleFavItems(drink, addBtn, removeBtn) {
+function displayFavButtons(drink, addBtn, removeBtn) {
   if (isFavourite(drink)) {
     removeBtn.style.display = "block";
     addBtn.style.display = "none";
