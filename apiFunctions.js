@@ -32,6 +32,8 @@ function mapRawCocktailData(rawCocktail) {
       searchUrl = "filter.php?i=";
     } else if (searchParameter === "glassType") {
       searchUrl = "filter.php?g=";
+    } else if (searchParameter === "id") {
+      searchUrl = "lookup.php?i=";
     }
   
     try {

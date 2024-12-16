@@ -1,4 +1,4 @@
-import { showRandomDrink, showDrinkSearchResult} from "./utilities.js";
+import { showRandomDrink, showDrinkSearchResult, displayFavDrinks} from "./utilities.js";
 
 // Declarations
 export const searchBar = document.querySelector("#searchBar");

@@ -99,6 +99,7 @@ function showDrinkDetails(drink) {
   <button id="backBtn">Back</button>
   <icon id="favIcon" class="material-symbols-outlined">Favorite</icon>
   <button id="addFavBtn" class="material-symbols-outlined">heart_plus</button>
+  <button id="removeFavBtn" class="material-symbols-outlined">heart_minus</button>
   <h2>${drink.name}</h2>
     <img src="${drink.thumbnail}" alt="${drink.name}">
     <div class="drinkInfo">
@@ -126,19 +127,16 @@ function showDrinkDetails(drink) {
   const backBtn = document.querySelector("#backBtn");
   const favIcon = document.querySelector("#favIcon");
   const addFavBtn = document.querySelector("#addFavBtn");
+  const removeFavBtn = document.querySelector("#removeFavBtn");
 
-  if (isFavourite(drink)) {
-    favIcon.style.display = "block";
-    addFavBtn.style.display = "none";
-  } else {
-    favIcon.style.display = "none";
-    addFavBtn.style.display = "block";
-  }
+  changeVisibleFavItems(drink, favIcon, addFavBtn, removeFavBtn);
 
   // Functionality for back button
   backBtn.addEventListener("click", () => {
-    if (lastAction) {
+    if (lastAction === showDrinkSearchResult) {
       showDrinkSearchResult();
+    } else if (lastAction === displayFavDrinks) {
+      displayFavDrinks();
     } else {
       drinkDetailsDiv.innerHTML = pageBefore; // reload last page
     }
@@ -152,8 +150,17 @@ function showDrinkDetails(drink) {
   });
 
   addFavBtn.addEventListener("click", () => {
-      saveFavs(drink);
+    saveFavs(drink);
+    changeVisibleFavItems(drink, favIcon, addFavBtn, removeFavBtn);
   });
+
+  removeFavBtn.addEventListener("click", () => {
+    removeFavs(drink);
+    changeVisibleFavItems(drink, favIcon, addFavBtn, removeFavBtn);
+    if (lastAction === displayFavDrinks) {
+      displayFavDrinks();
+    }
+  })
 }
 
 export async function showRandomDrink() {
@@ -184,7 +191,7 @@ export async function showDrinkSearchResult() {
     }
 
     previousSearchText = searchText;
-    
+
     if (searchText === "") {
       alert("You didn´t write anything!");
       return;
@@ -234,15 +241,39 @@ function displayPageOfResults(pageNr) {
 }
 // #endregion
 
-export function displayFavDrinks () {
+export async function displayFavDrinks() {
+  lastAction = displayFavDrinks;
+  drinkDetailsDiv.innerHTML = "";
+  let savedDrinks = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const drinkId = localStorage.key(i);
+      const drink = await getDrinksFromAPI("id", drinkId);
+      if (drink.length !== 0) {
+        savedDrinks.push(drink[0]);
+      }
 
+      searchResults = savedDrinks;
+      displayPageOfResults(1);
+
+      drinkDetailsDiv.appendChild(searchResultDiv);
+      drinkDetailsDiv.appendChild(pageBtnsDiv);
+    }
+  } catch (error) {
+    console.log(`There was an error fetching saved drinks: ${error}`)
+  }
 }
 
 function saveFavs(drink) {
   if (!isFavourite(drink)) {
     localStorage.setItem(drink.id, drink);
-    console.log(localStorage);
-  } 
+  }
+}
+
+function removeFavs(drink) {
+  if(isFavourite(drink)) {
+    localStorage.removeItem(drink.id);
+  }
 }
 
 function isFavourite(drink) {
@@ -250,4 +281,16 @@ function isFavourite(drink) {
     return true;
   }
   return false;
+}
+
+function changeVisibleFavItems(drink, icon, addBtn, removeBtn) {
+  if (isFavourite(drink)) {
+    icon.style.display = "block";
+    removeBtn.style.display = "block";
+    addBtn.style.display = "none";
+  } else {
+    icon.style.display = "none";
+    removeBtn.style.display = "none";
+    addBtn.style.display = "block";
+  }
 }
