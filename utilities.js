@@ -2,22 +2,21 @@ import { searchBar } from "./index.js";
 import { getDrinksFromAPI } from "./apiFunctions.js";
 
 // things to add:
-// Need more validation in search function, if the results are undefined it should display no results found
 // Favourite page
 
 // **Declarations**
 const drinkDetailsDiv = document.querySelector(".drinkDetailsContainer");
-const nrOfDrinksPerPage = 10;
 const searchResultDiv = document.createElement("div");
 searchResultDiv.classList.add("searchDisplay");
+const searchParameters = document.querySelector("#searchParameters");
 const pageBtnsDiv = document.createElement("div");
 pageBtnsDiv.classList.add("pagination");
 pageBtnsDiv.id = "paginationContainer";
+const nrOfDrinksPerPage = 10;
 let searchResults;
 let pageNr = 1;
 let lastAction = null;
 let previousSearchText = "";
-const searchParameters = document.querySelector("#searchParameters");
 
 // **Functions**
 
@@ -97,6 +96,9 @@ function showDrinkDetails(drink) {
   // #region Create drink detail elements
   const detailsPage = /*HTML*/ `
   <section class="drinkDetails">
+  <button id="backBtn">Back</button>
+  <icon id="favIcon" class="material-symbols-outlined">Favorite</icon>
+  <button id="addFavBtn" class="material-symbols-outlined">heart_plus</button>
   <h2>${drink.name}</h2>
     <img src="${drink.thumbnail}" alt="${drink.name}">
     <div class="drinkInfo">
@@ -117,18 +119,24 @@ function showDrinkDetails(drink) {
     </div>
   </section>
   `;
-  const backBtn = document.createElement("button");
-  backBtn.innerHTML = "Back";
   // #endregion
 
   // Insert created elements to DOM
   drinkDetailsDiv.innerHTML = detailsPage;
-  const drinkNameHTML = drinkDetailsDiv.querySelector("h2");
-  drinkNameHTML.parentNode.insertBefore(backBtn, drinkNameHTML.nextSibling);
+  const backBtn = document.querySelector("#backBtn");
+  const favIcon = document.querySelector("#favIcon");
+  const addFavBtn = document.querySelector("#addFavBtn");
+
+  if (isFavourite(drink)) {
+    favIcon.style.display = "block";
+    addFavBtn.style.display = "none";
+  } else {
+    favIcon.style.display = "none";
+    addFavBtn.style.display = "block";
+  }
 
   // Functionality for back button
   backBtn.addEventListener("click", () => {
-
     if (lastAction) {
       showDrinkSearchResult();
     } else {
@@ -141,6 +149,10 @@ function showDrinkDetails(drink) {
       drinkBefore.removeEventListener("click", drinkHandleOnClick);
       drinkBefore.addEventListener("click", drinkHandleOnClick);
     });
+  });
+
+  addFavBtn.addEventListener("click", () => {
+      saveFavs(drink);
   });
 }
 
@@ -221,3 +233,21 @@ function displayPageOfResults(pageNr) {
   createPaginationNrs(pageNr);
 }
 // #endregion
+
+export function displayFavDrinks () {
+
+}
+
+function saveFavs(drink) {
+  if (!isFavourite(drink)) {
+    localStorage.setItem(drink.id, drink);
+    console.log(localStorage);
+  } 
+}
+
+function isFavourite(drink) {
+  if (localStorage.getItem(drink.id)) {
+    return true;
+  }
+  return false;
+}

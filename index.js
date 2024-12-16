@@ -2,10 +2,14 @@ import { showRandomDrink, showDrinkSearchResult} from "./utilities.js";
 
 // Declarations
 export const searchBar = document.querySelector("#searchBar");
+const favBtn = document.querySelector("#favBtn");
 const rngDrinkBtn = document.querySelector("#randomDrinkBtn");
 const form = document.querySelector("form");
 
 // Event listeners
+favBtn.addEventListener("click", () => {
+  displayFavDrinks();
+});
 document.addEventListener("DOMContentLoaded", () => {
   showRandomDrink();
 });
