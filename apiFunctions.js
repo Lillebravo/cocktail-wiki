@@ -21,7 +21,7 @@ function mapRawCocktailData(rawCocktail) {
 }
 
 export async function getDrinksFromAPI(searchParameter, searchValue = null) {
-  const retryParams = ["_glass", "_flute", "_mug"];
+  const retryParams = ["_glass", "_flute", "_mug", "_drink"];
   let searchUrl = "";
 
   if (searchParameter === "random") {
@@ -44,27 +44,20 @@ export async function getDrinksFromAPI(searchParameter, searchValue = null) {
     if (searchValue === null || searchParameter === "random") {
       res = await fetch(`${baseURL}${searchUrl}`);
       data = await res.json();
-    } else if (searchParameter === "glassType") {
+    } else {
       res = await fetch(`${baseURL}${searchUrl}${searchValue}`);
       data = await res.json();
-
-      // Debugging
-      console.log("API Response:", data);
 
       // Trying other parameters if no data was found
       if (data.drinks === "no data found") {
         for (const param of retryParams) {
-          console.log("Retrying with:", searchValue + param); // more debugging
           res = await fetch(`${baseURL}${searchUrl}${searchValue}${param}`);
           data = await res.json();
 
           if (data.drinks !== "no data found") break;
         }
       }
-    } else {
-      res = await fetch(`${baseURL}${searchUrl}${searchValue}`);
-      data = await res.json();
-    }
+    } 
 
     // return an empty array if there were no drinks fetched
     if (!data.drinks) {
