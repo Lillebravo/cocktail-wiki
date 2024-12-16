@@ -1,85 +1,21 @@
 import { searchBar } from "./index.js";
+import { getDrinksFromAPI } from "./apiFunctions.js";
 
 // **Declarations**
-const baseURL = `https://www.thecocktaildb.com/api/json/v1/1/`;
 const drinkDetailsDiv = document.querySelector(".drinkDetailsContainer");
+const nrOfDrinksPerPage = 10;
+const searchResultDiv = document.createElement("div");
+searchResultDiv.classList.add("searchDisplay");
+const pageBtnsDiv = document.createElement("div");
+pageBtnsDiv.classList.add("pagination");
+pageBtnsDiv.id = "paginationContainer";
+let searchResults;
+let pageNr = 1;
+let lastAction = null;
+let previousSearchText = "";
+const searchParameters = document.querySelector("#searchParameters");
 
 // **Functions**
-// #region Helper functions
-function mapRawCocktailData(rawCocktail) {
-  /* Removes ingredients and measures which are null and some attributes which aren´t used */
-  return {
-    id: rawCocktail.idDrink,
-    name: rawCocktail.strDrink,
-    tags: rawCocktail.strTags ? rawCocktail.strTags.split(", ") : "None",
-    category: rawCocktail.strCategory,
-    alcoholic: rawCocktail.strAlcoholic === "Alcoholic",
-    glass: rawCocktail.strGlass,
-    instructions: rawCocktail.strInstructions,
-    thumbnail: rawCocktail.strDrinkThumb,
-    ingredients: Array.from({ length: 15 })
-      .map((_, i) => ({
-        ingredient: rawCocktail[`strIngredient${i + 1}`],
-        measure: rawCocktail[`strMeasure${i + 1}`],
-      }))
-      .filter((item) => item.ingredient),
-  };
-}
-// #endregion
-
-// #region Functions for getting data from API
-async function getRandomDrink() {
-  try {
-    const res = await fetch(`${baseURL}random.php`);
-    const data = await res.json();
-
-    // The API returns an array with one drink, here the first(and only) drink in the array is collected
-    const rawCocktial = data.drinks[0];
-    const randomDrink = mapRawCocktailData(rawCocktial);
-
-    return randomDrink;
-  } catch (error) {
-    console.log(`Error fetching random drink from API: ${error}`);
-  }
-}
-
-async function getDrinksByName(drink) {
-  try {
-    const res = await fetch(`${baseURL}search.php?s=${drink}`);
-    const data = await res.json();
-
-    // Create array of drinks and convert them to readable values
-    const rawCocktails = data.drinks;
-    const drinks = [];
-
-    // if data.drinks returns an empty array drinks will remain empty as well and return as such
-    if (rawCocktails.length > 0) {
-      for (let i = 0; i < rawCocktails.length; i++) {
-        const drink = mapRawCocktailData(rawCocktails[i]);
-        drinks.push(drink);
-      }
-    }
-
-    return drinks;
-  } catch (error) {
-    console.log(
-      `Error searching for drink by name ${drink} from API: ${error}`
-    );
-  }
-}
-
-async function getDrinksByCategory(drinkCategory) {
-
-}
-
-async function getDrinksByIngredient(drinkIngredient) {
-
-}
-
-async function getDrinksByGlassType(drinkGlassType) {
-
-}
-// #endregion
 
 // #region Element handling functions
 function createDrinkElement(drink) {
@@ -87,7 +23,6 @@ function createDrinkElement(drink) {
   drinkElement.classList.add("drink");
   drinkElement.innerHTML = `
     <h2>${drink.name}</h2>
-    <button id="drinkDetailsBtn">See more</button>
     <img src="${drink.thumbnail}" alt="${drink.name}"></img>
   `;
 
@@ -100,7 +35,7 @@ function drinkHandleOnClick(event) {
   const drinkElement = event.currentTarget;
   const drinkName = drinkElement.querySelector("h2").textContent;
 
-  getDrinksByName(drinkName).then((drinks) => {
+  getDrinksFromAPI(searchParameters.value, drinkName).then((drinks) => {
     if (drinks && drinks.length > 0) {
       // Looping through all drinks and compare their names with closest drinkname from target to get an exact match
       for (let i = 0; i < drinks.length; i++) {
@@ -112,15 +47,50 @@ function drinkHandleOnClick(event) {
     }
   });
 }
+
+function handlePageBtnClick(event) {
+  // Find clicked page button
+  const pageBtn = event.target.closest(".pageNumber");
+  if (pageBtn) {
+    // Find page number and display results for that page
+    const currentPageNr = parseInt(pageBtn.dataset.page);
+    pageNr = currentPageNr;
+    displayPageOfResults(currentPageNr);
+  }
+}
+
+function createPaginationNrs(currentPage) {
+  pageBtnsDiv.innerHTML = "";
+
+  // Calculate nr of pages and only create pagination if there is more than 10 search results
+  const nrOfPages = Math.ceil(searchResults.length / nrOfDrinksPerPage);
+  if (nrOfPages > 1) {
+    // Create a number button for every page
+    for (let i = 1; i <= nrOfPages; i++) {
+      const pageNrButton = document.createElement("button");
+      pageNrButton.innerHTML = i;
+      pageNrButton.dataset.page = i; // Add data to id the buttons for event handling
+      pageNrButton.classList.add("pageNumber");
+
+      // Highlight current page
+      if (i === currentPage) {
+        pageNrButton.classList.add("active");
+      }
+
+      pageBtnsDiv.appendChild(pageNrButton);
+    }
+
+    pageBtnsDiv.addEventListener("click", handlePageBtnClick);
+  }
+}
 // #endregion
 
 // #region Display functions
 function showDrinkDetails(drink) {
   // Save the HTML from the previous page
   const pageBefore = drinkDetailsDiv.innerHTML;
-  searchBar.value = "";
 
-  // Create drink detail elements
+  // #region Create drink detail elements
   const detailsPage = /*HTML*/ `
   <section class="drinkDetails">
   <h2>${drink.name}</h2>
@@ -145,6 +115,7 @@ function showDrinkDetails(drink) {
   `;
   const backBtn = document.createElement("button");
   backBtn.innerHTML = "Back";
+  // #endregion
 
   // Insert created elements to DOM
   drinkDetailsDiv.innerHTML = detailsPage;
@@ -153,10 +124,15 @@ function showDrinkDetails(drink) {
 
   // Functionality for back button
   backBtn.addEventListener("click", () => {
-    drinkDetailsDiv.innerHTML = pageBefore; // reload last page
-    const drinksBefore = document.querySelectorAll(".drink");
+
+    if (lastAction) {
+      showDrinkSearchResult();
+    } else {
+      drinkDetailsDiv.innerHTML = pageBefore; // reload last page
+    }
 
     // removing and adding eventlisteners to all drinks in last page to ensure there are no duplicates
+    const drinksBefore = document.querySelectorAll(".drink");
     drinksBefore.forEach((drinkBefore) => {
       drinkBefore.removeEventListener("click", drinkHandleOnClick);
       drinkBefore.addEventListener("click", drinkHandleOnClick);
@@ -168,8 +144,8 @@ export async function showRandomDrink() {
   try {
     searchBar.value = "";
 
-    const randomDrink = await getRandomDrink();
-    const drink = createDrinkElement(randomDrink);
+    const randomDrink = await getDrinksFromAPI("random");
+    const drink = createDrinkElement(randomDrink[0]);
 
     // Clearing current page and adding relevant info
     drinkDetailsDiv.innerHTML = `<h1 id="headerText">Welcome to Cocktail Wiki!</h1>
@@ -183,10 +159,18 @@ export async function showRandomDrink() {
 
 export async function showDrinkSearchResult() {
   try {
+    lastAction = showDrinkSearchResult;
     // Check if search input is valid
     const searchText = searchBar.value.trim();
+
+    if (previousSearchText !== searchText) {
+      pageNr = 1;
+    }
+
+    previousSearchText = searchText;
+    
     if (searchText === "") {
-      alert("You have to enter a cocktail name!");
+      alert("You didn´t write anything!");
       return;
     }
 
@@ -194,7 +178,7 @@ export async function showDrinkSearchResult() {
     drinkDetailsDiv.innerHTML = `<h1 id="headerText">Search Results:</h1>`;
 
     // get drinks from search
-    const searchResults = await getDrinksByName(searchText);
+    searchResults = await getDrinksFromAPI(searchParameters.value, searchText);
     if (!searchResults || searchResults.length === 0) {
       drinkDetailsDiv.innerHTML += `
       <h3 style="color: white">No cocktails matching search for ${searchText}</h3>
@@ -202,86 +186,34 @@ export async function showDrinkSearchResult() {
       return;
     }
 
-    // Create container for displaying results
-    const searchResultDiv = document.createElement("div");
-    searchResultDiv.classList.add("searchDisplay");
-
-    // Create container for page buttons
-    const pageDiv = document.createElement("div");
-    pageDiv.classList.add("pagination");
-    const nrOfDrinksPerPage = 10;
-
-    // #region displaying a specific page of results
-    function displayPageOfResults(pageNr) {
-      searchResultDiv.innerHTML = "";
-
-      // Determine start and end index for current page
-      const startIndex = (pageNr - 1) * nrOfDrinksPerPage;
-      const endIndex = startIndex + nrOfDrinksPerPage;
-
-      // take results for current page
-      const pageResults = searchResults.slice(startIndex, endIndex);
-
-      // create and add drink elements for this page
-      pageResults.forEach(drink => {
-          const newDrink = createDrinkElement(drink);
-          searchResultDiv.appendChild(newDrink);
-      });
-
-      // Update page numbers
-      createPaginationNrs(pageNr);
-    }
-    // #endregion
-
-    // #region creating page number buttons
-    function createPaginationNrs(currentPage) {
-      pageDiv.innerHTML = "";
-      
-      // Calculate nr of pages and only create pagination if there is more than 10 search results
-      const nrOfPages = Math.ceil(searchResults.length / nrOfDrinksPerPage);
-      if (nrOfPages > 1) {
-        // Create a number button for every page
-        for (let i = 1; i <= nrOfPages; i++) {
-          const pageNrButton = document.createElement("button");
-          pageNrButton.innerHTML = i;
-          pageNrButton.dataset.page = i; // Add data to id the buttons for event handling
-          pageNrButton.classList.add("pageNumber");
-         
-          // Highlight current page
-          if (i === currentPage) {
-            pageNrButton.classList.add("active");
-          }
-
-          pageDiv.appendChild(pageNrButton);
-        }
-
-        pageDiv.addEventListener("click", handlePageBtnClick);
-      }
-    }
-    // #endregion
-
-    // #region Event handling for page buttons
-    function handlePageBtnClick(event) {
-      // Find clicked page button
-      const pageBtn = event.target.closest(".pageNumber");
-      if (pageBtn) {
-        // Find page number and display results for that page
-        const pageNr = parseInt(pageBtn.dataset.page);
-        displayPageOfResults(pageNr);
-      }
-    }
-    // #endregion
-
     // Show results from page 1 at first
-    displayPageOfResults(1);
+    displayPageOfResults(pageNr);
 
     // Insert display with results and page number buttons to the page
     drinkDetailsDiv.appendChild(searchResultDiv);
-    drinkDetailsDiv.appendChild(pageDiv);
-  } 
-  
-  catch (error) {
+    drinkDetailsDiv.appendChild(pageBtnsDiv);
+  } catch (error) {
     console.log(`Error showing drinks from API: ${error}`);
   }
+}
+
+function displayPageOfResults(pageNr) {
+  searchResultDiv.innerHTML = "";
+
+  // Determine start and end index for current page
+  const startIndex = (pageNr - 1) * nrOfDrinksPerPage;
+  const endIndex = startIndex + nrOfDrinksPerPage;
+
+  // take results for current page
+  const pageResults = searchResults.slice(startIndex, endIndex);
+
+  // create and add drink elements for this page
+  pageResults.forEach((drink) => {
+    const newDrink = createDrinkElement(drink);
+    searchResultDiv.appendChild(newDrink);
+  });
+
+  // Update page numbers
+  createPaginationNrs(pageNr);
 }
 // #endregion

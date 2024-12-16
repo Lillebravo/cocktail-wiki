@@ -44,6 +44,11 @@ img {
   z-index: 1;
 }
 
+#searchParameters {
+  height: 2.5em;
+  width: 10em;
+}
+
 .btnGroup {
   margin-left: 20vw;
   display: flex;

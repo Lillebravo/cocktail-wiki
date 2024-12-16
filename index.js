@@ -9,16 +9,16 @@ const form = document.querySelector("form");
 document.addEventListener("DOMContentLoaded", () => {
   showRandomDrink();
 });
+rngDrinkBtn.addEventListener("click", () => {;
+  showRandomDrink();
+});
 rngDrinkBtn.addEventListener("mouseover", () => {
   rngDrinkBtn.classList.add("rotate-center"); // adding animations class on hover
 });
 rngDrinkBtn.addEventListener("mouseout", () => {
   rngDrinkBtn.classList.remove("rotate-center"); // removing animations
 });
-rngDrinkBtn.addEventListener("click", () => {;
-  showRandomDrink();
-});
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  showDrinkSearchResult()
+  showDrinkSearchResult();
 });
