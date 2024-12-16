@@ -24,6 +24,7 @@ let previousSearchText = "";
 function createDrinkElement(drink) {
   const drinkElement = document.createElement("section");
   drinkElement.classList.add("drink");
+  drinkElement.dataset.drinkId = drink.id; // for identifying the drinks
   drinkElement.innerHTML = `
     <h2>${drink.name}</h2>
     <img src="${drink.thumbnail}" alt="${drink.name}"></img>
@@ -38,7 +39,7 @@ function drinkHandleOnClick(event) {
   const drinkElement = event.currentTarget;
   const drinkName = drinkElement.querySelector("h2").textContent;
 
-  getDrinksFromAPI(searchParameters.value, drinkName).then((drinks) => {
+  getDrinksFromAPI("id", drinkElement.dataset.drinkId).then((drinks) => {
     if (drinks && drinks.length > 0) {
       // Looping through all drinks and compare their names with closest drinkname from target to get an exact match
       for (let i = 0; i < drinks.length; i++) {
