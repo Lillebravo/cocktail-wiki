@@ -97,7 +97,6 @@ function showDrinkDetails(drink) {
   const detailsPage = /*HTML*/ `
   <section class="drinkDetails">
   <button id="backBtn">Back</button>
-  <icon id="favIcon" class="material-symbols-outlined">Favorite</icon>
   <button id="addFavBtn" class="material-symbols-outlined">heart_plus</button>
   <button id="removeFavBtn" class="material-symbols-outlined">heart_minus</button>
   <h2>${drink.name}</h2>
@@ -125,11 +124,10 @@ function showDrinkDetails(drink) {
   // Insert created elements to DOM
   drinkDetailsDiv.innerHTML = detailsPage;
   const backBtn = document.querySelector("#backBtn");
-  const favIcon = document.querySelector("#favIcon");
   const addFavBtn = document.querySelector("#addFavBtn");
   const removeFavBtn = document.querySelector("#removeFavBtn");
 
-  changeVisibleFavItems(drink, favIcon, addFavBtn, removeFavBtn);
+  changeVisibleFavItems(drink, addFavBtn, removeFavBtn);
 
   // Functionality for back button
   backBtn.addEventListener("click", () => {
@@ -151,12 +149,12 @@ function showDrinkDetails(drink) {
 
   addFavBtn.addEventListener("click", () => {
     saveFavs(drink);
-    changeVisibleFavItems(drink, favIcon, addFavBtn, removeFavBtn);
+    changeVisibleFavItems(drink, addFavBtn, removeFavBtn);
   });
 
   removeFavBtn.addEventListener("click", () => {
     removeFavs(drink);
-    changeVisibleFavItems(drink, favIcon, addFavBtn, removeFavBtn);
+    changeVisibleFavItems(drink, addFavBtn, removeFavBtn);
     if (lastAction === displayFavDrinks) {
       displayFavDrinks();
     }
@@ -164,6 +162,7 @@ function showDrinkDetails(drink) {
 }
 
 export async function showRandomDrink() {
+  lastAction = null;
   try {
     searchBar.value = "";
 
@@ -182,14 +181,15 @@ export async function showRandomDrink() {
 
 export async function showDrinkSearchResult() {
   try {
-    lastAction = showDrinkSearchResult;
-    // Check if search input is valid
-    const searchText = searchBar.value.trim();
+    lastAction = showDrinkSearchResult; // for back button functionality
+    const searchText = searchBar.value.trim(); // Check if search input is valid
 
+    // Resets the page number if new search text differs from last one
     if (previousSearchText !== searchText) {
       pageNr = 1;
     }
 
+    // Sets previous text to current search text after checking if they differ
     previousSearchText = searchText;
 
     if (searchText === "") {
@@ -241,10 +241,13 @@ function displayPageOfResults(pageNr) {
 }
 // #endregion
 
+
+// #region saveFunctions
 export async function displayFavDrinks() {
   lastAction = displayFavDrinks;
-  drinkDetailsDiv.innerHTML = "";
+  drinkDetailsDiv.innerHTML = `<h1 id="headerText">Saved Drinks:</h1>`;
   let savedDrinks = [];
+
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const drinkId = localStorage.key(i);
@@ -261,6 +264,10 @@ export async function displayFavDrinks() {
     }
   } catch (error) {
     console.log(`There was an error fetching saved drinks: ${error}`)
+  }
+
+  if (savedDrinks.length === 0) {
+    drinkDetailsDiv.innerHTML += `<h3 style="color: white">You have no saved drinks!</h3>`;
   }
 }
 
@@ -283,14 +290,13 @@ function isFavourite(drink) {
   return false;
 }
 
-function changeVisibleFavItems(drink, icon, addBtn, removeBtn) {
+function changeVisibleFavItems(drink, addBtn, removeBtn) {
   if (isFavourite(drink)) {
-    icon.style.display = "block";
     removeBtn.style.display = "block";
     addBtn.style.display = "none";
   } else {
-    icon.style.display = "none";
     removeBtn.style.display = "none";
     addBtn.style.display = "block";
   }
 }
+// #endregion
